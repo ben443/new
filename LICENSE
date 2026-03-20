@@ -1,0 +1,33 @@
+GNU GENERAL PUBLIC LICENSE
+Version 2, June 1991
+
+Copyright (C) 2024 NetHunter Community
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+================================================================================
+
+This project includes code from various sources:
+
+- Kali NetHunter (https://gitlab.com/kalilinux/nethunter)
+  Copyright (C) Offensive Security
+
+- Linux Kernel (https://www.kernel.org/)
+  Copyright (C) Linus Torvalds and contributors
+
+- AnyKernel3 (https://github.com/osm0sis/AnyKernel3)
+  Copyright (C) osm0sis
+
+All respective copyrights and licenses apply.

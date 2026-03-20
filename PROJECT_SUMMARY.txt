@@ -1,0 +1,209 @@
+================================================================================
+        NetHunter Kernel Build Environment for Samsung Galaxy Tab S8
+                    gts8wifi (SM-X700) - SM8450 (Snapdragon 8 Gen 1)
+================================================================================
+
+PROJECT OVERVIEW
+--------------------------------------------------------------------------------
+This project provides a complete build environment for compiling a Kali NetHunter
+kernel for the Samsung Galaxy Tab S8 (gts8wifi/SM-X700) with the SM8450 (Snapdragon
+8 Gen 1) chipset.
+
+GKI (GENERIC KERNEL IMAGE) SUPPORT
+--------------------------------------------------------------------------------
+This device uses GKI (Generic Kernel Image) architecture:
+- GKI Version: android13-5.10
+- Kernel: 5.10.x (Generic)
+- Vendor Modules: Device-specific drivers built separately
+
+The build process:
+1. Builds the generic GKI kernel using gki_defconfig
+2. Builds vendor-specific modules separately
+3. Packages both for installation
+
+GKI Notes:
+- The kernel image (Image.gz) is the generic GKI kernel
+- Vendor modules are built as loadable modules (.ko files)
+- Some features require loading modules after boot
+- The boot partition contains GKI kernel + vendor ramdisk
+
+CONTENTS
+--------------------------------------------------------------------------------
+This package contains the following files:
+
+BUILD SCRIPTS:
+  - build-nethunter.sh          Main build script (47KB)
+  - flash-helper.sh             Flash helper script (19KB)
+  - device-config.sh            Device configuration (14KB)
+
+CONFIGURATION:
+  - nethunter-config.fragment   NetHunter kernel options (15KB)
+  - Dockerfile                  Docker build environment (2KB)
+  - docker-compose.yml          Docker compose config (0.7KB)
+
+DOCUMENTATION:
+  - README.md                   Comprehensive documentation (10KB)
+  - QUICKSTART.md               Quick start guide (3.9KB)
+  - FILES.md                    File structure documentation (8KB)
+  - LICENSE                     GPL v2 License (1.2KB)
+  - PROJECT_SUMMARY.txt         This file
+
+FEATURES
+--------------------------------------------------------------------------------
+The NetHunter kernel includes:
+
+  [✓] USB HID (Keyboard/Mouse) support for rubber ducky attacks
+  [✓] Wi-Fi frame injection for aircrack-ng
+  [✓] Monitor mode support
+  [✓] RTL8812AU/RTL8814AU driver support (ALFA AWUS036ACH)
+  [✓] RTL8188EUS driver support (TP-Link TL-WN722N v2/v3)
+  [✓] Atheros AR9271 support (TP-Link TL-WN722N v1)
+  [✓] MediaTek MT7601U support
+  [✓] Bluetooth RFCOMM support
+  [✓] USB Gadget mode support
+  [✓] TUN/TAP support for VPN
+  [✓] Full kernel module support
+
+QUICK START
+--------------------------------------------------------------------------------
+1. Install dependencies:
+   sudo apt-get install -y git build-essential bc bison flex libssl-dev \
+       libncurses5-dev device-tree-compiler lz4 xz-utils wget curl \
+       python3 ccache libelf-dev kmod zip unzip
+
+2. Run the build:
+   chmod +x build-nethunter.sh
+   ./build-nethunter.sh full
+
+3. Flash the kernel:
+   ./flash-helper.sh
+   (Select option 4 for TWRP or option 5 for Magisk)
+
+BUILD OPTIONS
+--------------------------------------------------------------------------------
+The build script supports multiple commands:
+
+  ./build-nethunter.sh full        Full build (recommended)
+  ./build-nethunter.sh setup       Setup environment only
+  ./build-nethunter.sh toolchains  Download toolchains only
+  ./build-nethunter.sh source      Download kernel source only
+  ./build-nethunter.sh configure   Configure kernel only
+  ./build-nethunter.sh build       Build kernel only
+  ./build-nethunter.sh package     Package kernel only
+  ./build-nethunter.sh clean       Clean build directory
+
+DOCKER BUILD
+--------------------------------------------------------------------------------
+For a consistent build environment, use Docker:
+
+  docker build -t nethunter-gts8wifi-builder .
+  docker run -v $(pwd)/output:/build/output nethunter-gts8wifi-builder \
+      ./build-nethunter.sh full
+
+Or use docker-compose:
+
+  docker-compose up --build
+
+DEVICE COMPATIBILITY
+--------------------------------------------------------------------------------
+  Device:     Samsung Galaxy Tab S8
+  Codename:   gts8wifi
+  Model:      SM-X700 (WiFi variant)
+  Chipset:    SM8450 (Snapdragon 8 Gen 1)
+  Kernel:     5.10.x
+  Android:    12/13/14 (One UI 4.1/5.0/6.0)
+
+SUPPORTED WIFI ADAPTERS
+--------------------------------------------------------------------------------
+  - TP-Link TL-WN722N v1 (Atheros AR9271)
+  - TP-Link TL-WN722N v2/v3 (Realtek RTL8188EUS)
+  - ALFA AWUS036ACH (Realtek RTL8812AU)
+  - ALFA AWUS036NHA (Atheros AR9271)
+  - Panda PAU09 (Ralink RT5572)
+  - Edimax EW-7811Un (Realtek RTL8188CUS)
+  - MediaTek MT7601U
+
+PREREQUISITES
+--------------------------------------------------------------------------------
+  - Unlocked bootloader
+  - Custom recovery (TWRP) installed
+  - Root access (Magisk recommended)
+  - USB debugging enabled
+  - At least 50GB free disk space
+  - 8GB RAM minimum (16GB recommended)
+  - Stable internet connection
+
+WARNINGS
+--------------------------------------------------------------------------------
+  ⚠️  Flashing custom kernels will trip Knox (irreversible)
+  ⚠️  This will void your warranty
+  ⚠️  Backup your data before proceeding
+  ⚠️  Flash at your own risk - custom kernels can brick devices
+
+POST-INSTALLATION
+--------------------------------------------------------------------------------
+1. Install NetHunter app from store.nethunter.com
+2. Install Kali chroot via NetHunter app
+3. Connect USB WiFi adapter via OTG cable
+4. Test with: iwconfig, airmon-ng, etc.
+
+TROUBLESHOOTING
+--------------------------------------------------------------------------------
+  - Build fails: Check dependencies, reduce JOBS variable
+  - Bootloop: Restore backup via flash-helper.sh
+  - WiFi not detected: Check USB connection, load driver manually
+  - See README.md for detailed troubleshooting
+
+RESOURCES
+--------------------------------------------------------------------------------
+  - NetHunter Docs:    https://www.kali.org/docs/nethunter/
+  - XDA Forums:        https://xdaforums.com/c/samsung-galaxy-tab-s8.12693/
+  - Kernel Source:     https://github.com/akm-04/Samsung_Kernel_sm8450_common_gts8x
+  - NetHunter GitLab:  https://gitlab.com/kalilinux/nethunter
+
+LICENSE
+--------------------------------------------------------------------------------
+This project is licensed under the GNU General Public License v2.
+See LICENSE file for details.
+
+CREDITS
+--------------------------------------------------------------------------------
+  - Kali NetHunter Team (Offensive Security)
+  - Samsung (for kernel sources)
+  - LineageOS Team
+  - XDA Community
+  - All contributors
+
+================================================================================
+                          Build Instructions Summary
+================================================================================
+
+STEP 1: PREPARE
+  - Install dependencies (see QUICKSTART.md)
+  - Unlock bootloader (will wipe data)
+  - Install TWRP recovery
+  - Root with Magisk
+
+STEP 2: BUILD
+  - Run: ./build-nethunter.sh full
+  - Wait 30-60 minutes for build to complete
+  - Output will be in output/ directory
+
+STEP 3: FLASH
+  - Backup current kernel: ./flash-helper.sh (option 2)
+  - Flash new kernel: ./flash-helper.sh (option 4 or 5)
+  - Reboot device
+
+STEP 4: INSTALL NETHUNTER
+  - Install NetHunter app from store.nethunter.com
+  - Install Kali chroot (Full or Minimal)
+  - Grant root permissions
+
+STEP 5: TEST
+  - Connect WiFi adapter via USB OTG
+  - Check with: iwconfig, lsusb
+  - Test injection: airmon-ng start wlan1
+
+================================================================================
+For detailed instructions, see README.md and QUICKSTART.md
+================================================================================

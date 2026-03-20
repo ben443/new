@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  builder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: nethunter-gts8wifi-builder:latest
+    container_name: nethunter-builder
+    volumes:
+      - ./output:/build/output
+      - nethunter-ccache:/build/.ccache
+      - ./build-nethunter.sh:/build/build-nethunter.sh:ro
+      - ./device-config.sh:/build/device-config.sh:ro
+    environment:
+      - CCACHE_DIR=/build/.ccache
+      - CCACHE_COMPRESS=1
+      - CCACHE_MAXSIZE=50G
+      - USE_CCACHE=1
+    working_dir: /build
+    stdin_open: true
+    tty: true
+    command: /bin/bash
+    deploy:
+      resources:
+        limits:
+          cpus: '8'
+          memory: 16G
+        reservations:
+          cpus: '4'
+          memory: 8G
+
+volumes:
+  nethunter-ccache:
+    driver: local
