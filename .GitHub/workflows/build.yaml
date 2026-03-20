@@ -1,0 +1,71 @@
+name: Build NetHunter Kernel
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            git build-essential bc bison flex libssl-dev \
+            libncurses5-dev libncursesw5-dev device-tree-compiler \
+            lz4 xz-utils wget curl python3 python3-pip ccache \
+            libelf-dev libxml2-utils kmod cpio qttools5-dev \
+            libqt5widgets5 fakeroot zip unzip lynx pandoc \
+            axel binutils-aarch64-linux-gnu
+
+      - name: Make build script executable
+        run: chmod +x build-nethunter.sh
+
+      - name: Run full build
+        run: ./build-nethunter.sh full
+
+      - name: Check build output
+        run: |
+          ls -la output/
+          du -h output/*
+
+      - name: Upload kernel artifacts
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: nethunter-kernel-artifacts
+          path: output/
+          retention-days: 30
+
+      - name: Create Release
+        if: success()
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: kernel-${{ github.run_number }}
+          release_name: NetHunter Kernel Build ${{ github.run_number }}
+          body: |
+            Automated kernel build for Samsung Galaxy Tab S8 (gts8wifi)
+            Build triggered by: ${{ github.event_name }}
+            Commit: ${{ github.sha }}
+          draft: false
+          prerelease: false
+
+      - name: Upload release assets
+        if: success()
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./output/
+          asset_name: nethunter-gts8wifi-kernel
+          asset_content_type: application/zip
