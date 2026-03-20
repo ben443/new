@@ -499,7 +499,7 @@ download_toolchains() {
     fi
 
     log_info "Toolchains downloaded successfully!"
-}
+
     # Download GCC toolchain for arm
     if [ ! -d "armhf-5.5" ]; then
         log_info "Downloading ARM GCC toolchain..."
