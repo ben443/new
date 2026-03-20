@@ -453,18 +453,53 @@ setup_environment() {
 
 download_toolchains() {
     log_step "Downloading and setting up toolchains..."
-    
     cd "${TOOLCHAIN_DIR}"
-    
+
     # Download GCC toolchain for aarch64
     if [ ! -d "aarch64-5.5" ]; then
         log_info "Downloading AArch64 GCC toolchain..."
         wget -q --show-progress "${AARCH64_GCC_URL}" -O aarch64-toolchain.tar.xz
         tar -xf aarch64-toolchain.tar.xz
-        mv linaro-aarch64-5.5 aarch64-5.5
+
+        # Validate extraction before move
+        if [ -d "linaro-aarch64-5.5" ]; then
+            mv linaro-aarch64-5.5 aarch64-5.5
+        else
+            log_error "Expected directory linaro-aarch64-5.5 not found after extraction!"
+            ls -la
+            exit 1
+        fi
         rm aarch64-toolchain.tar.xz
     fi
-    
+
+    # Download GCC toolchain for arm
+    if [ ! -d "armhf-5.5" ]; then
+        log_info "Downloading ARM GCC toolchain..."
+        wget -q --show-progress "${ARM_GCC_URL}" -O arm-toolchain.tar.xz
+        tar -xf arm-toolchain.tar.xz
+
+        # Validate extraction before move
+        if [ -d "linaro-armhf-5.5" ]; then
+            mv linaro-armhf-5.5 armhf-5.5
+        else
+            log_error "Expected directory linaro-armhf-5.5 not found after extraction!"
+            ls -la
+            exit 1
+        fi
+        rm arm-toolchain.tar.xz
+    fi
+
+    # Download Clang
+    if [ ! -d "clang-r416183b" ]; then
+        log_info "Downloading Clang toolchain..."
+        wget -q --show-progress "${CLANG_URL}" -O clang.tar.gz
+        tar -xzf clang.tar.gz
+        mv android_prebuilts_clang_kernel_linux-x86_clang-r416183b-lineage-20.0 clang-r416183b
+        rm clang.tar.gz
+    fi
+
+    log_info "Toolchains downloaded successfully!"
+}
     # Download GCC toolchain for arm
     if [ ! -d "armhf-5.5" ]; then
         log_info "Downloading ARM GCC toolchain..."
