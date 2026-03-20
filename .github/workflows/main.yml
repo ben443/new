@@ -12,7 +12,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
@@ -37,7 +37,7 @@ jobs:
           du -h output/*
 
       - name: Upload kernel artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: nethunter-kernel-artifacts
@@ -46,7 +46,7 @@ jobs:
 
       - name: Create Release
         if: success()
-        uses: actions/create-release@v1
+        uses: actions/create-release@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
