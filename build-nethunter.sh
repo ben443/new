@@ -463,7 +463,7 @@ download_toolchains() {
 
         # Validate extraction before move
         if [ -d "linaro-aarch64-5.5" ]; then
-            mv linaro-aarch64-5.5 aarch64-5.5
+            mv linaro-aarch64-5.5 linaro-aarch64-5.5
         else
             log_error "Expected directory linaro-aarch64-5.5 not found after extraction!"
             ls -la
@@ -480,7 +480,7 @@ download_toolchains() {
 
         # Validate extraction before move
         if [ -d "linaro-armhf-5.5" ]; then
-            mv linaro-armhf-5.5 armhf-5.5
+            mv linaro-armhf-5.5 linaro-armhf-5.5
         else
             log_error "Expected directory linaro-armhf-5.5 not found after extraction!"
             ls -la
@@ -505,7 +505,7 @@ download_toolchains() {
         log_info "Downloading ARM GCC toolchain..."
         wget -q --show-progress "${ARM_GCC_URL}" -O arm-toolchain.tar.xz
         tar -xf arm-toolchain.tar.xz
-        mv linaro-armhf-5.5 armhf-5.5
+        mv linaro-armhf-5.5 linaro-armhf-5.5
         rm arm-toolchain.tar.xz
     fi
     
