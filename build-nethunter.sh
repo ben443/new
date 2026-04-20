@@ -53,6 +53,68 @@ JOBS=$(nproc --all)
 # Helper Functions
 ################################################################################
 
+generate_anykernel_script() {
+    local is_gki="${1:-false}"
+    local kernel_string="NetHunter Kernel for Galaxy Tab S8 (gts8wifi)"
+    local systemless="1"
+    local supported_versions="12.0-14.0"
+    local is_slot_device="auto"
+    local gki_comments_1=""
+    local gki_comments_2=""
+
+    if [ "${is_gki}" = "true" ]; then
+        kernel_string="NetHunter GKI Kernel for Galaxy Tab S8 (gts8wifi)"
+        systemless="0"
+        supported_versions="13.0-14.0"
+        is_slot_device="0"
+        gki_comments_1="
+# GKI specific: Don't replace the kernel, just add modules
+# For GKI, we need to use vendor_boot or vendor_dlkm partition"
+        gki_comments_2="
+# For GKI devices, the kernel stays the same
+# We only need to update vendor modules if needed"
+    fi
+
+    cat > anykernel.sh << EOF
+### AnyKernel3 Ramdisk Mod Script
+## osm0sis @ xda-developers
+
+### AnyKernel setup
+# global properties
+properties() {
+kernel.string=${kernel_string}
+do.devicecheck=1
+do.modules=1
+do.systemless=${systemless}
+do.cleanup=1
+do.cleanuponabort=0
+device.name1=gts8wifi
+device.name2=gts8
+device.name3=SM-X700
+device.name4=SM-X706
+device.name5=
+supported.versions=${supported_versions}
+supported.patchlevels=
+
+block=boot
+is_slot_device=${is_slot_device}
+ramdisk_compression=auto
+}
+
+# import functions/variables and setup patching - see for reference (DO NOT REMOVE)
+. tools/ak3-core.sh${gki_comments_1}
+
+# boot shell variables
+slot_select=none
+
+# boot install
+dump_boot${gki_comments_2}
+
+write_boot
+## end boot install
+EOF
+}
+
 print_banner() {
     echo -e "${BLUE}"
     echo "╔══════════════════════════════════════════════════════════════════════════════╗"
@@ -309,50 +371,7 @@ create_gki_anykernel_zip() {
     cd AnyKernel3
     
     # Configure AnyKernel3 for GKI device
-    cat > anykernel.sh << EOF
-### AnyKernel3 Ramdisk Mod Script
-## osm0sis @ xda-developers
-
-### AnyKernel setup
-# global properties
-properties() { 
-kernel.string=NetHunter GKI Kernel for Galaxy Tab S8 (gts8wifi)
-do.devicecheck=1
-do.modules=1
-do.systemless=0
-do.cleanup=1
-do.cleanuponabort=0
-device.name1=gts8wifi
-device.name2=gts8
-device.name3=SM-X700
-device.name4=SM-X706
-device.name5=
-supported.versions=13.0-14.0
-supported.patchlevels=
-
-block=boot
-is_slot_device=0
-ramdisk_compression=auto
-}
-
-# import functions/variables and setup patching - see for reference (DO NOT REMOVE)
-. tools/ak3-core.sh
-
-# GKI specific: Don't replace the kernel, just add modules
-# For GKI, we need to use vendor_boot or vendor_dlkm partition
-
-# boot shell variables
-slot_select=none
-
-# boot install
-dump_boot
-
-# For GKI devices, the kernel stays the same
-# We only need to update vendor modules if needed
-
-write_boot
-## end boot install
-EOF
+    generate_anykernel_script "true"
     
     # Copy GKI kernel image
     if [ -f "${OUTPUT_DIR}/kernel/Image.gz" ]; then
@@ -2089,44 +2108,7 @@ create_anykernel_zip() {
     cd AnyKernel3
     
     # Configure AnyKernel3 for gts8wifi
-    cat > anykernel.sh << EOF
-### AnyKernel3 Ramdisk Mod Script
-## osm0sis @ xda-developers
-
-### AnyKernel setup
-# global properties
-properties() { 
-kernel.string=NetHunter Kernel for Galaxy Tab S8 (gts8wifi)
-do.devicecheck=1
-do.modules=1
-do.systemless=1
-do.cleanup=1
-do.cleanuponabort=0
-device.name1=gts8wifi
-device.name2=gts8
-device.name3=SM-X700
-device.name4=SM-X706
-device.name5=
-supported.versions=12.0-14.0
-supported.patchlevels=
-
-block=boot
-is_slot_device=auto
-ramdisk_compression=auto
-}
-
-# import functions/variables and setup patching - see for reference (DO NOT REMOVE)
-. tools/ak3-core.sh
-
-# boot shell variables
-slot_select=none
-
-# boot install
-dump_boot
-
-write_boot
-## end boot install
-EOF
+    generate_anykernel_script "false"
     
     # Copy kernel image
     cp "${OUTPUT_DIR}/kernel/Image.gz" zImage 2>/dev/null || \
