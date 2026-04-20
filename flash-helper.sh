@@ -6,14 +6,6 @@
 
 set -e
 
-# Color codes
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
-NC='\033[0m'
-
 # Device info
 DEVICE_CODENAME="gts8wifi"
 DEVICE_MODEL="SM-X700"
@@ -22,34 +14,8 @@ DEVICE_MODEL="SM-X700"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OUTPUT_DIR="${SCRIPT_DIR}/output"
 
-################################################################################
-# Helper Functions
-################################################################################
-
-log_info() {
-    echo -e "${GREEN}[INFO]${NC} $1"
-}
-
-log_warn() {
-    echo -e "${YELLOW}[WARN]${NC} $1"
-}
-
-log_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-log_step() {
-    echo -e "${BLUE}[STEP]${NC} $1"
-}
-
-print_banner() {
-    echo -e "${CYAN}"
-    echo "╔══════════════════════════════════════════════════════════════════════════════╗"
-    echo "║              NetHunter Flash Helper for Galaxy Tab S8                        ║"
-    echo "║                         gts8wifi (SM-X700)                                   ║"
-    echo "╚══════════════════════════════════════════════════════════════════════════════╝"
-    echo -e "${NC}"
-}
+# Source common utilities
+source "${SCRIPT_DIR}/common-utils.sh"
 
 ################################################################################
 # Check Device Connection
@@ -483,7 +449,7 @@ show_menu() {
 }
 
 main() {
-    print_banner
+    print_banner "NetHunter Flash Helper for Galaxy Tab S8" "gts8wifi (SM-X700)" "${CYAN}"
     
     while true; do
         show_menu
