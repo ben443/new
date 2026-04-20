@@ -20,7 +20,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Default configuration
 KERNEL_SOURCE_URL="https://github.com/akm-04/Samsung_Kernel_sm8450_common_gts8x"
-KERNEL_BRANCH="main"
+KERNEL_BRANCH="msm-kernel_Nethunter"
 DEVICE_CODENAME="gts8wifi"
 DEVICE_MODEL="SM-X700"
 CHIPSET="SM8450"
@@ -462,10 +462,10 @@ download_toolchains() {
         tar -xf aarch64-toolchain.tar.xz
 
         # Validate extraction before move
-        if [ -d "linaro-aarch64-5.5" ]; then
-            mv linaro-aarch64-5.5 linaro-aarch64-5.5
+        if [ -d "aarch64-linaro-5.5" ]; then
+            mv aarch64-linaro-5.5 aarch64-5.5
         else
-            log_error "Expected directory linaro-aarch64-5.5 not found after extraction!"
+            log_error "Expected directory aarch64-linaro-5.5 not found after extraction!"
             ls -la
             exit 1
         fi
@@ -479,10 +479,10 @@ download_toolchains() {
         tar -xf arm-toolchain.tar.xz
 
         # Validate extraction before move
-        if [ -d "linaro-armhf-5.5" ]; then
-            mv linaro-armhf-5.5 linaro-armhf-5.5
+        if [ -d "armhf-linaro-5.5" ]; then
+            mv armhf-linaro-5.5 armhf-5.5
         else
-            log_error "Expected directory linaro-armhf-5.5 not found after extraction!"
+            log_error "Expected directory armhf-linaro-5.5 not found after extraction!"
             ls -la
             exit 1
         fi
@@ -498,26 +498,6 @@ download_toolchains() {
         rm clang.tar.gz
     fi
 
-    log_info "Toolchains downloaded successfully!"
-
-    # Download GCC toolchain for arm
-    if [ ! -d "armhf-5.5" ]; then
-        log_info "Downloading ARM GCC toolchain..."
-        wget -q --show-progress "${ARM_GCC_URL}" -O arm-toolchain.tar.xz
-        tar -xf arm-toolchain.tar.xz
-        mv linaro-armhf-5.5 linaro-armhf-5.5
-        rm arm-toolchain.tar.xz
-    fi
-    
-    # Download Clang
-    if [ ! -d "clang-r416183b" ]; then
-        log_info "Downloading Clang toolchain..."
-        wget -q --show-progress "${CLANG_URL}" -O clang.tar.gz
-        tar -xzf clang.tar.gz
-        mv android_prebuilts_clang_kernel_linux-x86_clang-r416183b-lineage-20.0 clang-r416183b
-        rm clang.tar.gz
-    fi
-    
     log_info "Toolchains downloaded successfully!"
 }
 
