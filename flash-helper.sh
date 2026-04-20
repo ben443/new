@@ -98,6 +98,27 @@ check_root() {
 }
 
 ################################################################################
+# Wait for Fastboot
+################################################################################
+
+wait_for_fastboot() {
+    local timeout=30
+    local elapsed=0
+
+    log_info "Waiting for device to enter fastboot mode..."
+    while [ $elapsed -lt $timeout ]; do
+        if fastboot devices | grep -q "fastboot"; then
+            return 0
+        fi
+        sleep 1
+        elapsed=$((elapsed + 1))
+    done
+
+    log_error "Timeout waiting for fastboot mode!"
+    return 1
+}
+
+################################################################################
 # Backup Current Kernel
 ################################################################################
 
@@ -229,11 +250,7 @@ flash_fastboot() {
     log_info "Rebooting to bootloader..."
     adb reboot bootloader
     
-    sleep 5
-    
-    # Check fastboot connection
-    if ! fastboot devices | grep -q "fastboot"; then
-        log_error "Device not in fastboot mode!"
+    if ! wait_for_fastboot; then
         return 1
     fi
     
@@ -329,11 +346,7 @@ test_kernel() {
     log_info "Rebooting to bootloader..."
     adb reboot bootloader
     
-    sleep 5
-    
-    # Check fastboot connection
-    if ! fastboot devices | grep -q "fastboot"; then
-        log_error "Device not in fastboot mode!"
+    if ! wait_for_fastboot; then
         return 1
     fi
     
