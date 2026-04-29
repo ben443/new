@@ -2285,5 +2285,7 @@ main() {
     done
 }
 
-# Run main function
-main "$@"
+# Run main function if not sourced
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi
