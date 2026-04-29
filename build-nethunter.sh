@@ -78,6 +78,22 @@ log_step() {
     echo -e "${BLUE}[STEP]${NC} $1"
 }
 
+check_archive() {
+    local archive="$1"
+
+    # Check if tar can read the archive
+    if ! tar -tf "$archive" >/dev/null 2>&1; then
+        log_error "Failed to read archive: $archive"
+        return 1
+    fi
+
+    if tar -tf "$archive" | grep -q -E '^\/|(\/|^)\.\.(\/|$)'; then
+        log_error "Security violation: Archive $archive contains unsafe paths!"
+        return 1
+    fi
+    return 0
+}
+
 ################################################################################
 # GKI Specific Functions
 ################################################################################
@@ -459,6 +475,7 @@ download_toolchains() {
     if [ ! -d "aarch64-5.5" ]; then
         log_info "Downloading AArch64 GCC toolchain..."
         wget -q --show-progress "${AARCH64_GCC_URL}" -O aarch64-toolchain.tar.xz
+        check_archive aarch64-toolchain.tar.xz || exit 1
         tar -xf aarch64-toolchain.tar.xz
 
         # Validate extraction before move
@@ -476,6 +493,7 @@ download_toolchains() {
     if [ ! -d "armhf-5.5" ]; then
         log_info "Downloading ARM GCC toolchain..."
         wget -q --show-progress "${ARM_GCC_URL}" -O arm-toolchain.tar.xz
+        check_archive arm-toolchain.tar.xz || exit 1
         tar -xf arm-toolchain.tar.xz
 
         # Validate extraction before move
@@ -493,6 +511,7 @@ download_toolchains() {
     if [ ! -d "clang-r416183b" ]; then
         log_info "Downloading Clang toolchain..."
         wget -q --show-progress "${CLANG_URL}" -O clang.tar.gz
+        check_archive clang.tar.gz || exit 1
         tar -xzf clang.tar.gz
         mv android_prebuilts_clang_kernel_linux-x86_clang-r416183b-lineage-20.0 clang-r416183b
         rm clang.tar.gz
@@ -504,6 +523,7 @@ download_toolchains() {
     if [ ! -d "armhf-5.5" ]; then
         log_info "Downloading ARM GCC toolchain..."
         wget -q --show-progress "${ARM_GCC_URL}" -O arm-toolchain.tar.xz
+        check_archive arm-toolchain.tar.xz || exit 1
         tar -xf arm-toolchain.tar.xz
         mv linaro-armhf-5.5 linaro-armhf-5.5
         rm arm-toolchain.tar.xz
@@ -513,6 +533,7 @@ download_toolchains() {
     if [ ! -d "clang-r416183b" ]; then
         log_info "Downloading Clang toolchain..."
         wget -q --show-progress "${CLANG_URL}" -O clang.tar.gz
+        check_archive clang.tar.gz || exit 1
         tar -xzf clang.tar.gz
         mv android_prebuilts_clang_kernel_linux-x86_clang-r416183b-lineage-20.0 clang-r416183b
         rm clang.tar.gz
