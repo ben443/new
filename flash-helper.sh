@@ -151,12 +151,16 @@ restore_backup() {
     
     if [ -z "$backup_file" ]; then
         if [ -f "${BACKUP_DIR}/latest_backup.txt" ]; then
-            backup_file=$(cat "${BACKUP_DIR}/latest_backup.txt")
+            # Extract just the filename to prevent path traversal
+            backup_name=$(basename "$(cat "${BACKUP_DIR}/latest_backup.txt")")
+            backup_file="${BACKUP_DIR}/${backup_name}"
         else
             backup_file=$(ls -1t "${BACKUP_DIR}"/boot_backup_*.img | head -1)
         fi
     else
-        backup_file="${BACKUP_DIR}/${backup_file}"
+        # Extract just the filename to prevent path traversal from user input
+        backup_name=$(basename "$backup_file")
+        backup_file="${BACKUP_DIR}/${backup_name}"
     fi
     
     if [ ! -f "$backup_file" ]; then
