@@ -111,9 +111,9 @@ backup_kernel() {
     BACKUP_FILE="${BACKUP_DIR}/boot_backup_${TIMESTAMP}.img"
     
     log_info "Dumping current boot image..."
-    adb shell "su -c 'dd if=/dev/block/bootdevice/by-name/boot of=/sdcard/boot_backup.img'"
-    adb pull /sdcard/boot_backup.img "${BACKUP_FILE}"
-    adb shell "rm /sdcard/boot_backup.img"
+    adb shell "su -c 'dd if=/dev/block/bootdevice/by-name/boot of=/data/local/tmp/boot_backup.img && chmod 644 /data/local/tmp/boot_backup.img'"
+    adb pull /data/local/tmp/boot_backup.img "${BACKUP_FILE}"
+    adb shell "rm /data/local/tmp/boot_backup.img"
     
     if [ -f "${BACKUP_FILE}" ]; then
         log_info "Backup saved to: ${BACKUP_FILE}"
@@ -167,11 +167,11 @@ restore_backup() {
     log_info "Restoring from: $backup_file"
     
     # Push backup to device
-    adb push "$backup_file" /sdcard/boot_restore.img
+    adb push "$backup_file" /data/local/tmp/boot_restore.img
     
     # Flash backup
-    adb shell "su -c 'dd if=/sdcard/boot_restore.img of=/dev/block/bootdevice/by-name/boot'"
-    adb shell "rm /sdcard/boot_restore.img"
+    adb shell "su -c 'dd if=/data/local/tmp/boot_restore.img of=/dev/block/bootdevice/by-name/boot'"
+    adb shell "rm /data/local/tmp/boot_restore.img"
     
     log_info "Backup restored successfully!"
     log_info "Rebooting device..."
@@ -202,9 +202,9 @@ flash_fastboot() {
         # Check for ramdisk
         if [ ! -f "${SCRIPT_DIR}/ramdisk.gz" ]; then
             log_warn "Ramdisk not found. Attempting to extract from current boot..."
-            adb shell "su -c 'dd if=/dev/block/bootdevice/by-name/boot of=/sdcard/current_boot.img'"
-            adb pull /sdcard/current_boot.img "${OUTPUT_DIR}/current_boot.img"
-            adb shell "rm /sdcard/current_boot.img"
+            adb shell "su -c 'dd if=/dev/block/bootdevice/by-name/boot of=/data/local/tmp/current_boot.img && chmod 644 /data/local/tmp/current_boot.img'"
+            adb pull /data/local/tmp/current_boot.img "${OUTPUT_DIR}/current_boot.img"
+            adb shell "rm /data/local/tmp/current_boot.img"
             
             # Extract ramdisk using magiskboot if available
             if command -v magiskboot &> /dev/null; then
@@ -402,13 +402,14 @@ install_wifi_drivers() {
     
     # Push modules to device
     log_info "Pushing WiFi driver modules..."
-    adb push "${MODULES_DIR}" /sdcard/nethunter_modules
+    adb shell "mkdir -p /data/local/tmp/nethunter_modules && chmod 777 /data/local/tmp/nethunter_modules"
+    adb push "${MODULES_DIR}/." /data/local/tmp/nethunter_modules/
     
     # Install modules
     log_info "Installing modules..."
-    adb shell "su -c 'cp /sdcard/nethunter_modules/*.ko /system/lib/modules/'" 2>/dev/null || \
-    adb shell "su -c 'cp /sdcard/nethunter_modules/*.ko /vendor/lib/modules/'" 2>/dev/null || \
-    adb shell "su -c 'insmod /sdcard/nethunter_modules/*.ko'"
+    adb shell "su -c 'cp /data/local/tmp/nethunter_modules/*.ko /system/lib/modules/'" 2>/dev/null || \
+    adb shell "su -c 'cp /data/local/tmp/nethunter_modules/*.ko /vendor/lib/modules/'" 2>/dev/null || \
+    adb shell "su -c 'insmod /data/local/tmp/nethunter_modules/*.ko'"
     
     # Load specific drivers
     log_info "Loading WiFi drivers..."
@@ -418,7 +419,7 @@ install_wifi_drivers() {
     adb shell "su -c 'modprobe mt7601u'" 2>/dev/null || true
     
     # Cleanup
-    adb shell "rm -rf /sdcard/nethunter_modules"
+    adb shell "rm -rf /data/local/tmp/nethunter_modules"
     
     log_info "WiFi drivers installed!"
     
