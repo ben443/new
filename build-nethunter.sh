@@ -245,13 +245,14 @@ build_vendor_modules() {
     log_info "Installing vendor modules..."
     make modules_install INSTALL_MOD_PATH="${VENDOR_DIR}"
     
-    # Strip modules
-    log_info "Stripping vendor modules..."
-    find "${VENDOR_DIR}" -name "*.ko" -exec ${STRIP} --strip-unneeded {} \; 2>/dev/null || true
-    
-    # Create vendor module list
-    log_info "Vendor modules built:"
-    find "${VENDOR_DIR}" -name "*.ko" -exec basename {} \; | tee "${OUTPUT_DIR}/vendor-modules.list"
+    # Strip modules and create vendor module list
+    log_info "Stripping and listing vendor modules..."
+    find "${VENDOR_DIR}" -name "*.ko" -exec sh -c '
+        for module; do
+            '"${STRIP}"' --strip-unneeded "$module" 2>/dev/null || true
+        done
+        basename -a "$@"
+    ' _ {} + | tee "${OUTPUT_DIR}/vendor-modules.list"
     
     log_info "Vendor modules built successfully!"
 }
