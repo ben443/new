@@ -151,12 +151,25 @@ restore_backup() {
     
     if [ -z "$backup_file" ]; then
         if [ -f "${BACKUP_DIR}/latest_backup.txt" ]; then
-            backup_file=$(cat "${BACKUP_DIR}/latest_backup.txt")
+            raw_file=$(cat "${BACKUP_DIR}/latest_backup.txt")
+            base_name=$(basename "$raw_file")
+            if [[ "$base_name" == boot_backup_*.img ]]; then
+                backup_file="${BACKUP_DIR}/${base_name}"
+            else
+                log_warn "Invalid backup file in latest_backup.txt, falling back to latest available"
+                backup_file=$(ls -1t "${BACKUP_DIR}"/boot_backup_*.img 2>/dev/null | head -1)
+            fi
         else
-            backup_file=$(ls -1t "${BACKUP_DIR}"/boot_backup_*.img | head -1)
+            backup_file=$(ls -1t "${BACKUP_DIR}"/boot_backup_*.img 2>/dev/null | head -1)
         fi
     else
-        backup_file="${BACKUP_DIR}/${backup_file}"
+        base_name=$(basename "$backup_file")
+        if [[ "$base_name" == boot_backup_*.img ]]; then
+            backup_file="${BACKUP_DIR}/${base_name}"
+        else
+            log_error "Invalid backup filename provided. Must match boot_backup_*.img"
+            return 1
+        fi
     fi
     
     if [ ! -f "$backup_file" ]; then
