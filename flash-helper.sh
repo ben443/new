@@ -167,10 +167,17 @@ restore_backup() {
     log_info "Restoring from: $backup_file"
     
     # Push backup to device
-    adb push "$backup_file" /sdcard/boot_restore.img
+    if ! adb push "$backup_file" /sdcard/boot_restore.img; then
+        log_error "Failed to push backup to device"
+        return 1
+    fi
     
     # Flash backup
-    adb shell "su -c 'dd if=/sdcard/boot_restore.img of=/dev/block/bootdevice/by-name/boot'"
+    if ! adb shell "su -c 'dd if=/sdcard/boot_restore.img of=/dev/block/bootdevice/by-name/boot'"; then
+        log_error "Failed to flash backup to boot partition"
+        adb shell "rm /sdcard/boot_restore.img" 2>/dev/null || true
+        return 1
+    fi
     adb shell "rm /sdcard/boot_restore.img"
     
     log_info "Backup restored successfully!"
