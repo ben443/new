@@ -156,7 +156,12 @@ restore_backup() {
             backup_file=$(ls -1t "${BACKUP_DIR}"/boot_backup_*.img | head -1)
         fi
     else
-        backup_file="${BACKUP_DIR}/${backup_file}"
+        clean_filename=$(basename "$backup_file")
+        if [ "$clean_filename" != "$backup_file" ] || [ "$clean_filename" == ".." ] || [ "$clean_filename" == "." ]; then
+            log_error "Invalid backup filename. Path traversal is not allowed."
+            return 1
+        fi
+        backup_file="${BACKUP_DIR}/${clean_filename}"
     fi
     
     if [ ! -f "$backup_file" ]; then
