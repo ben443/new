@@ -6,7 +6,7 @@
 # Kernel Version: 5.10.x
 ################################################################################
 
-set -e
+
 
 # Color codes for output
 RED='\033[0;31m'
@@ -2286,4 +2286,6 @@ main() {
 }
 
 # Run main function
-main "$@"
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi
