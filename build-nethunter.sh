@@ -247,11 +247,11 @@ build_vendor_modules() {
     
     # Strip modules
     log_info "Stripping vendor modules..."
-    find "${VENDOR_DIR}" -name "*.ko" -exec ${STRIP} --strip-unneeded {} \; 2>/dev/null || true
+    find "${VENDOR_DIR}" -name "*.ko" -exec ${STRIP} --strip-unneeded "{}" + 2>/dev/null || true
     
     # Create vendor module list
     log_info "Vendor modules built:"
-    find "${VENDOR_DIR}" -name "*.ko" -exec basename {} \; | tee "${OUTPUT_DIR}/vendor-modules.list"
+    find "${VENDOR_DIR}" -name "*.ko" -exec basename -a "{}" + | tee "${OUTPUT_DIR}/vendor-modules.list"
     
     log_info "Vendor modules built successfully!"
 }
@@ -275,7 +275,7 @@ package_gki_kernel() {
     
     # Copy dtb files
     if [ -d "arch/arm64/boot/dts" ]; then
-        find "arch/arm64/boot/dts" -name "*.dtb" -exec cp {} "${OUTPUT_DIR}/kernel/" \; 2>/dev/null || true
+        find "arch/arm64/boot/dts" -name "*.dtb" -exec cp -t "${OUTPUT_DIR}/kernel/" "{}" + 2>/dev/null || true
     fi
     
     # Create dtb.img if multiple dtbs exist
@@ -2048,7 +2048,7 @@ package_kernel() {
     # Copy dtb files
     log_info "Copying device tree blobs..."
     if [ -d "arch/arm64/boot/dts" ]; then
-        find "arch/arm64/boot/dts" -name "*.dtb" -exec cp {} "${OUTPUT_DIR}/kernel/" \; 2>/dev/null || true
+        find "arch/arm64/boot/dts" -name "*.dtb" -exec cp -t "${OUTPUT_DIR}/kernel/" "{}" + 2>/dev/null || true
     fi
     
     # Create dtb.img if multiple dtbs exist
@@ -2062,7 +2062,7 @@ package_kernel() {
     
     # Strip modules
     log_info "Stripping kernel modules..."
-    find "${MODULES_DIR}" -name "*.ko" -exec ${CROSS_COMPILE}strip --strip-unneeded {} \; 2>/dev/null || true
+    find "${MODULES_DIR}" -name "*.ko" -exec ${CROSS_COMPILE}strip --strip-unneeded "{}" + 2>/dev/null || true
     
     # Create flashable zip using AnyKernel3
     create_anykernel_zip
