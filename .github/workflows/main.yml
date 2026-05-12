@@ -44,29 +44,16 @@ jobs:
           path: output/
           retention-days: 30
 
-      - name: Create Release
-        id: create_release
+      - name: Release
+        uses: softprops/action-gh-release@v2
         if: success()
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: kernel-${{ github.run_number }}
-          release_name: NetHunter Kernel Build ${{ github.run_number }}
+          name: NetHunter Kernel Build ${{ github.run_number }}
           body: |
             Automated kernel build for Samsung Galaxy Tab S8 (gts8wifi)
             Build triggered by: ${{ github.event_name }}
             Commit: ${{ github.sha }}
-          draft: false
-          prerelease: false
-
-      - name: Upload release assets
-        if: success()
-        uses: actions/upload-release-asset@v1
+          files: output/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./output/
-          asset_name: nethunter-gts8wifi-kernel
-          asset_content_type: application/zip

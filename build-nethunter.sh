@@ -20,7 +20,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Default configuration
 KERNEL_SOURCE_URL="https://github.com/akm-04/Samsung_Kernel_sm8450_common_gts8x"
-KERNEL_BRANCH="main"
+KERNEL_BRANCH="msm-kernel_Nethunter"
 DEVICE_CODENAME="gts8wifi"
 DEVICE_MODEL="SM-X700"
 CHIPSET="SM8450"
