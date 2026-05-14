@@ -408,9 +408,9 @@ install_wifi_drivers() {
     
     # Install modules
     log_info "Installing modules..."
-    adb shell "su -c 'cp /sdcard/nethunter_modules/*.ko /system/lib/modules/'" 2>/dev/null || \
-    adb shell "su -c 'cp /sdcard/nethunter_modules/*.ko /vendor/lib/modules/'" 2>/dev/null || \
-    adb shell "su -c 'insmod /sdcard/nethunter_modules/*.ko'"
+    adb shell "su -c 'find /sdcard/nethunter_modules -name \"*.ko\" -type f -exec cp -- \"{}\" /system/lib/modules/ \;' " 2>/dev/null || \
+    adb shell "su -c 'find /sdcard/nethunter_modules -name \"*.ko\" -type f -exec cp -- \"{}\" /vendor/lib/modules/ \;' " 2>/dev/null || \
+    adb shell "su -c 'find /sdcard/nethunter_modules -name \"*.ko\" -type f -exec insmod \"{}\" \;' "
     
     # Load specific drivers
     log_info "Loading WiFi drivers..."
