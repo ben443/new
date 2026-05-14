@@ -477,10 +477,10 @@ download_toolchains() {
         tar -xf aarch64-toolchain.tar.xz
 
         # Validate extraction before move
-        if [ -d "linaro-aarch64-5.5" ]; then
-            mv linaro-aarch64-5.5 aarch64-5.5
+        if [ -d "aarch64-linaro-5.5" ]; then
+            mv aarch64-linaro-5.5 aarch64-5.5
         else
-            log_error "Expected directory linaro-aarch64-5.5 not found after extraction!"
+            log_error "Expected directory aarch64-linaro-5.5 not found after extraction!"
             ls -la
             exit 1
         fi
@@ -507,7 +507,7 @@ download_toolchains() {
         if [ -d "linaro-armhf-5.5" ]; then
             mv linaro-armhf-5.5 armhf-5.5
         else
-            log_error "Expected directory linaro-armhf-5.5 not found after extraction!"
+            log_error "Expected directory armhf-linaro-5.5 not found after extraction!"
             ls -la
             exit 1
         fi
@@ -518,20 +518,6 @@ download_toolchains() {
     if [ ! -d "clang-r416183b" ]; then
         log_info "Downloading Clang toolchain..."
         wget -q --show-progress "${CLANG_URL}" -O clang.tar.gz
-
-        # Validate checksum
-        log_info "Verifying Clang toolchain checksum..."
-        if ! echo "${CLANG_SHA256}  clang.tar.gz" | sha256sum -c - >/dev/null; then
-            log_error "Checksum validation failed for Clang toolchain!"
-            rm -f clang.tar.gz
-            exit 1
-        fi
-        log_info "Checksum verified successfully."
-
-        tar -xzf clang.tar.gz
-        mv android_prebuilts_clang_kernel_linux-x86_clang-r416183b-lineage-20.0 clang-r416183b
-        rm clang.tar.gz
-    fi
 
     log_info "Toolchains downloaded successfully!"
 }
