@@ -46,6 +46,11 @@ AARCH64_GCC_URL="https://kali.download/nethunter-images/toolchains/linaro-aarch6
 ARM_GCC_URL="https://kali.download/nethunter-images/toolchains/linaro-armhf-5.5.tar.xz"
 CLANG_URL="https://github.com/LineageOS/android_prebuilts_clang_kernel_linux-x86_clang-r416183b/archive/refs/heads/lineage-20.0.tar.gz"
 
+# Toolchain Checksums
+AARCH64_GCC_SHA256="c6b91ba3d3b32703c1f9864819718ff1dc2e3a58e6e2c29957f554821122030a"
+ARM_GCC_SHA256="0f8c7d5d3cfe7bd78acfd0f42e89cd04b86eaee3368dc01ee75aa372e290c987"
+CLANG_SHA256="6cd51bc5002e1c3f93c8f388716aaf48ac3efe19279e9b1c8291f69172927cb4"
+
 # Number of parallel jobs
 JOBS=$(nproc --all)
 
@@ -247,11 +252,11 @@ build_vendor_modules() {
     
     # Strip modules
     log_info "Stripping vendor modules..."
-    find "${VENDOR_DIR}" -name "*.ko" -exec ${STRIP} --strip-unneeded {} \; 2>/dev/null || true
+    find "${VENDOR_DIR}" -name "*.ko" -exec ${STRIP} --strip-unneeded "{}" + 2>/dev/null || true
     
     # Create vendor module list
     log_info "Vendor modules built:"
-    find "${VENDOR_DIR}" -name "*.ko" -exec basename {} \; | tee "${OUTPUT_DIR}/vendor-modules.list"
+    find "${VENDOR_DIR}" -name "*.ko" -exec basename -a "{}" + | tee "${OUTPUT_DIR}/vendor-modules.list"
     
     log_info "Vendor modules built successfully!"
 }
@@ -275,7 +280,7 @@ package_gki_kernel() {
     
     # Copy dtb files
     if [ -d "arch/arm64/boot/dts" ]; then
-        find "arch/arm64/boot/dts" -name "*.dtb" -exec cp {} "${OUTPUT_DIR}/kernel/" \; 2>/dev/null || true
+        find "arch/arm64/boot/dts" -name "*.dtb" -exec cp -t "${OUTPUT_DIR}/kernel/" "{}" + 2>/dev/null || true
     fi
     
     # Create dtb.img if multiple dtbs exist
@@ -459,6 +464,16 @@ download_toolchains() {
     if [ ! -d "aarch64-5.5" ]; then
         log_info "Downloading AArch64 GCC toolchain..."
         wget -q --show-progress "${AARCH64_GCC_URL}" -O aarch64-toolchain.tar.xz
+
+        # Validate checksum
+        log_info "Verifying AArch64 GCC toolchain checksum..."
+        if ! echo "${AARCH64_GCC_SHA256}  aarch64-toolchain.tar.xz" | sha256sum -c - >/dev/null; then
+            log_error "Checksum validation failed for AArch64 GCC toolchain!"
+            rm -f aarch64-toolchain.tar.xz
+            exit 1
+        fi
+        log_info "Checksum verified successfully."
+
         tar -xf aarch64-toolchain.tar.xz
 
         # Validate extraction before move
@@ -476,11 +491,21 @@ download_toolchains() {
     if [ ! -d "armhf-5.5" ]; then
         log_info "Downloading ARM GCC toolchain..."
         wget -q --show-progress "${ARM_GCC_URL}" -O arm-toolchain.tar.xz
+
+        # Validate checksum
+        log_info "Verifying ARM GCC toolchain checksum..."
+        if ! echo "${ARM_GCC_SHA256}  arm-toolchain.tar.xz" | sha256sum -c - >/dev/null; then
+            log_error "Checksum validation failed for ARM GCC toolchain!"
+            rm -f arm-toolchain.tar.xz
+            exit 1
+        fi
+        log_info "Checksum verified successfully."
+
         tar -xf arm-toolchain.tar.xz
 
         # Validate extraction before move
-        if [ -d "armhf-linaro-5.5" ]; then
-            mv armhf-linaro-5.5 armhf-5.5
+        if [ -d "linaro-armhf-5.5" ]; then
+            mv linaro-armhf-5.5 armhf-5.5
         else
             log_error "Expected directory armhf-linaro-5.5 not found after extraction!"
             ls -la
@@ -493,10 +518,6 @@ download_toolchains() {
     if [ ! -d "clang-r416183b" ]; then
         log_info "Downloading Clang toolchain..."
         wget -q --show-progress "${CLANG_URL}" -O clang.tar.gz
-        tar -xzf clang.tar.gz
-        mv android_prebuilts_clang_kernel_linux-x86_clang-r416183b-lineage-20.0 clang-r416183b
-        rm clang.tar.gz
-    fi
 
     log_info "Toolchains downloaded successfully!"
 }
@@ -2028,7 +2049,7 @@ package_kernel() {
     # Copy dtb files
     log_info "Copying device tree blobs..."
     if [ -d "arch/arm64/boot/dts" ]; then
-        find "arch/arm64/boot/dts" -name "*.dtb" -exec cp {} "${OUTPUT_DIR}/kernel/" \; 2>/dev/null || true
+        find "arch/arm64/boot/dts" -name "*.dtb" -exec cp -t "${OUTPUT_DIR}/kernel/" "{}" + 2>/dev/null || true
     fi
     
     # Create dtb.img if multiple dtbs exist
@@ -2042,7 +2063,7 @@ package_kernel() {
     
     # Strip modules
     log_info "Stripping kernel modules..."
-    find "${MODULES_DIR}" -name "*.ko" -exec ${CROSS_COMPILE}strip --strip-unneeded {} \; 2>/dev/null || true
+    find "${MODULES_DIR}" -name "*.ko" -exec ${CROSS_COMPILE}strip --strip-unneeded "{}" + 2>/dev/null || true
     
     # Create flashable zip using AnyKernel3
     create_anykernel_zip
@@ -2265,5 +2286,8 @@ main() {
     done
 }
 
-# Run main function
+
+# Wrap main function execution in condition for testing
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 main "$@"
+fi

@@ -156,6 +156,8 @@ restore_backup() {
             backup_file=$(ls -1t "${BACKUP_DIR}"/boot_backup_*.img | head -1)
         fi
     else
+        # Sanitize input to prevent path traversal
+        backup_file=$(basename -- "$backup_file")
         backup_file="${BACKUP_DIR}/${backup_file}"
     fi
     
@@ -164,7 +166,7 @@ restore_backup() {
         return 1
     fi
     
-    log_info "Restoring from: $backup_file"
+    log_info "Restoring from: $(basename -- "$backup_file")"
     
     # Push backup to device
     adb push "$backup_file" /data/local/tmp/boot_restore.img
@@ -571,4 +573,6 @@ main() {
 }
 
 # Run main function
-main
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main
+fi
