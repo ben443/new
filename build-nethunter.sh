@@ -2265,5 +2265,8 @@ main() {
     done
 }
 
-# Run main function
+
+# Wrap main function execution in condition for testing
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
 main "$@"
+fi
