@@ -112,7 +112,11 @@ backup_kernel() {
     
     log_info "Dumping current boot image..."
     adb shell "su -c 'dd if=/dev/block/bootdevice/by-name/boot of=/data/local/tmp/boot_backup.img'"
-    adb pull /data/local/tmp/boot_backup.img "${BACKUP_FILE}"
+    if ! adb pull /data/local/tmp/boot_backup.img "${BACKUP_FILE}"; then
+        log_error "Failed to pull boot_backup.img from device"
+        adb shell "rm /data/local/tmp/boot_backup.img" 2>/dev/null
+        return 1
+    fi
     adb shell "rm /data/local/tmp/boot_backup.img"
     
     if [ -f "${BACKUP_FILE}" ]; then
@@ -169,7 +173,10 @@ restore_backup() {
     log_info "Restoring from: $(basename -- "$backup_file")"
     
     # Push backup to device
-    adb push "$backup_file" /data/local/tmp/boot_restore.img
+    if ! adb push "$backup_file" /data/local/tmp/boot_restore.img; then
+        log_error "Failed to push backup file to device"
+        return 1
+    fi
     
     # Flash backup
     adb shell "su -c 'dd if=/data/local/tmp/boot_restore.img of=/dev/block/bootdevice/by-name/boot'"
@@ -205,7 +212,11 @@ flash_fastboot() {
         if [ ! -f "${SCRIPT_DIR}/ramdisk.gz" ]; then
             log_warn "Ramdisk not found. Attempting to extract from current boot..."
             adb shell "su -c 'dd if=/dev/block/bootdevice/by-name/boot of=/data/local/tmp/current_boot.img'"
-            adb pull /data/local/tmp/current_boot.img "${OUTPUT_DIR}/current_boot.img"
+            if ! adb pull /data/local/tmp/current_boot.img "${OUTPUT_DIR}/current_boot.img"; then
+                log_error "Failed to pull current_boot.img from device"
+                adb shell "rm /data/local/tmp/current_boot.img" 2>/dev/null
+                return 1
+            fi
             adb shell "rm /data/local/tmp/current_boot.img"
             
             # Extract ramdisk using magiskboot if available
@@ -271,7 +282,10 @@ flash_twrp() {
     
     # Push zip to device
     log_info "Pushing kernel zip to device..."
-    adb push "$AK_ZIP" /data/local/tmp/
+    if ! adb push "$AK_ZIP" /data/local/tmp/; then
+        log_error "Failed to push AnyKernel zip to device"
+        return 1
+    fi
     
     # Reboot to recovery
     log_info "Rebooting to TWRP..."
@@ -302,7 +316,10 @@ flash_magisk() {
     
     # Push zip to device
     log_info "Pushing kernel zip to device..."
-    adb push "$AK_ZIP" /sdcard/Download/
+    if ! adb push "$AK_ZIP" /sdcard/Download/; then
+        log_error "Failed to push AnyKernel zip to device"
+        return 1
+    fi
     
     log_info "Kernel zip pushed to /sdcard/Download/"
     log_info "Please install via Magisk Manager:"
@@ -404,7 +421,10 @@ install_wifi_drivers() {
     
     # Push modules to device
     log_info "Pushing WiFi driver modules..."
-    adb push "${MODULES_DIR}" /data/local/tmp/nethunter_modules
+    if ! adb push "${MODULES_DIR}" /data/local/tmp/nethunter_modules; then
+        log_error "Failed to push WiFi driver modules to device"
+        return 1
+    fi
     
     # Install modules
     log_info "Installing modules..."
