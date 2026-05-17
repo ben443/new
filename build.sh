@@ -9,7 +9,7 @@ set -e
 # ==========================================
 # IMPORTANT: Update DEFCONFIG to match your source.
 # For Tab S8 (SM8450), check arch/arm64/configs/ (or arch/arm64/configs/vendor/)
-DEFCONFIG="vendor/taro_defconfig" 
+DEFCONFIG="vendor/taro_defconfig"
 
 # Working directories
 KERNEL_DIR="$(pwd)"
