@@ -451,6 +451,19 @@ setup_environment() {
 # Toolchain Setup
 ################################################################################
 
+validate_tarball() {
+    local archive="$1"
+    if ! tar -tf "$archive" > /dev/null 2>&1; then
+        log_error "Invalid tar archive: $archive"
+        return 1
+    fi
+    if tar -tf "$archive" | grep -q -E '^\/|(\/|^)\.\.(\/|$)'; then
+        log_error "Insecure archive contents detected (absolute paths or directory traversal) in $archive"
+        return 1
+    fi
+    return 0
+}
+
 download_toolchains() {
     log_step "Downloading and setting up toolchains..."
     cd "${TOOLCHAIN_DIR}"
@@ -459,6 +472,10 @@ download_toolchains() {
     if [ ! -d "aarch64-5.5" ]; then
         log_info "Downloading AArch64 GCC toolchain..."
         wget -q --show-progress "${AARCH64_GCC_URL}" -O aarch64-toolchain.tar.xz
+        if ! validate_tarball aarch64-toolchain.tar.xz; then
+            rm -f aarch64-toolchain.tar.xz
+            return 1
+        fi
         tar -xf aarch64-toolchain.tar.xz
 
         # Validate extraction before move
@@ -476,6 +493,10 @@ download_toolchains() {
     if [ ! -d "armhf-5.5" ]; then
         log_info "Downloading ARM GCC toolchain..."
         wget -q --show-progress "${ARM_GCC_URL}" -O arm-toolchain.tar.xz
+        if ! validate_tarball arm-toolchain.tar.xz; then
+            rm -f arm-toolchain.tar.xz
+            return 1
+        fi
         tar -xf arm-toolchain.tar.xz
 
         # Validate extraction before move
@@ -493,6 +514,10 @@ download_toolchains() {
     if [ ! -d "clang-r416183b" ]; then
         log_info "Downloading Clang toolchain..."
         wget -q --show-progress "${CLANG_URL}" -O clang.tar.gz
+        if ! validate_tarball clang.tar.gz; then
+            rm -f clang.tar.gz
+            return 1
+        fi
         tar -xzf clang.tar.gz
         mv android_prebuilts_clang_kernel_linux-x86_clang-r416183b-lineage-20.0 clang-r416183b
         rm clang.tar.gz
