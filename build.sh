@@ -22,7 +22,8 @@ echo "--- Checking Toolchain ---"
 if [ ! -d "${CLANG_DIR}" ]; then
     echo "Downloading AOSP Clang Toolchain..."
     mkdir -p "${CLANG_DIR}"
-    git clone --depth=1 https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-r450784d.git "${CLANG_DIR}"
+    # Reliable Clang 14 mirror optimized for Android GKI 5.10
+    git clone --depth=1 https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86 "${CLANG_DIR}"
 else
     echo "Toolchain already exists."
 fi
