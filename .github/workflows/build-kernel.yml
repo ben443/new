@@ -1,0 +1,43 @@
+name: Build Galaxy Tab S8 Kernel
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch: # Allows manual triggering from the GitHub UI
+
+jobs:
+  build-kernel:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout Kernel Source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1 # Shallow clone to save time
+
+      - name: Setup Build Environment
+        run: |
+          echo "Updating packages and installing dependencies..."
+          sudo apt-get update -y
+          # Added missing GCC cross-compilers, ncurses, dwarves (pahole), and lz4
+          sudo apt-get install -y build-essential bc curl git python3 python3-pip \
+            zip unzip libssl-dev libelf-dev flex bison libc6-dev-i386 xz-utils \
+            ccache wget rsync cpio lz4 dwarves libncurses-dev \
+            gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi
+
+      - name: Make Build Script Executable
+        run: chmod +x build.sh
+
+      - name: Run Build Script
+        run: ./build.sh
+
+      - name: Upload Kernel Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Tab-S8-Kernel-Image
+          path: |
+            out/arch/arm64/boot/Image
+            out/arch/arm64/boot/dts/vendor/qcom/*.dtb
+          retention-days: 15
