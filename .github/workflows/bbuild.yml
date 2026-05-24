@@ -1,59 +1,29 @@
-name: Build Galaxy Tab S8 Kernel
+name: Build Android Kernel
 
 on:
-  push:
-    branches:
-      - main
-      - master
-  workflow_dispatch:
+  workflow_dispatch: # Allows you to trigger the build manually from GitHub
 
 jobs:
   build-kernel:
-    runs-on: ubuntu-22.04
-    timeout-minutes: 60
-    env:
-      CCACHE_DIR: ${{ github.workspace }}/.ccache
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Kernel Source
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
+    - name: Checkout Kernel Source
+      uses: actions/checkout@v4
 
-      - name: Setup Build Environment
-        run: |
-          echo "Updating packages and installing dependencies..."
-          sudo apt-get update -y
-          sudo apt-get install -y build-essential bc curl git python3 python3-pip \
-            zip unzip libssl-dev libelf-dev flex bison libc6-dev-i386 xz-utils \
-            ccache wget rsync cpio lz4 dwarves libncurses-dev \
-            gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi
+    - name: Install Build Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y bc bison build-essential flex libcrypto++-dev libssl-dev libelf-dev profiles-extra compression-tools zip unzip perl sed
 
-      - name: Cache Toolchain
-        uses: actions/cache@v4
-        with:
-          path: toolchain
-          key: clang-r450784d
+    - name: Run Kernel Build Script
+      run: |
+        chmod +x build.sh
+        ./build.sh
 
-      - name: Cache ccache
-        uses: actions/cache@v4
-        with:
-          path: .ccache
-          key: ccache-${{ runner.os }}-${{ github.sha }}
-          restore-keys: ccache-${{ runner.os }}-
-
-      - name: Make Build Script Executable
-        run: chmod +x build.sh
-
-      - name: Run Build Script
-        run: ./build.sh
-
-      - name: Upload Kernel Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Tab-S8-Kernel-Image
-          path: |
-            out/arch/arm64/boot/Image
-            out/arch/arm64/boot/dts/vendor/qcom/*.dtb
-          retention-days: 15
-          if-no-files-found: error
+    - name: Upload Flashable Kernel Zip
+      uses: actions/upload-artifact@v4
+      with:
+        name: Galaxy-Tab-S8-Kernel-Zip
+        path: TabS8_Kernel_GKI.zip
+        retention-days: 7 # Saves space by deleting the file after 7 days
