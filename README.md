@@ -140,7 +140,7 @@ sudo apt-get install -y \
 #### 1. Clone this repository
 
 ```bash
-git clone https://github.com/yourusername/nethunter-gts8wifi.git
+git clone https://github.com/ben443/new
 cd nethunter-gts8wifi
 ```
 

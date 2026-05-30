@@ -465,10 +465,10 @@ setup_chroot() {
     log_info "Downloading NetHunter chroot..."
     
     # Download full chroot
-    adb shell "su -c 'cd /data/local && wget https://kali.download/nethunter-images/current/rootfs/kalifs-arm64-full.tar.xz'"
+    adb shell "su -c 'cd /data/local && wget https://kali.download/nethunter-images/current/rootfs/kali-nethunter-rootfs-full-arm64.tar.xz'"
     
     log_info "Extracting chroot..."
-    adb shell "su -c 'cd /data/local && mkdir -p nhsystem && tar -xJf kalifs-arm64-full.tar.xz -C nhsystem && mv nhsystem/kalifs-* nhsystem/kali-arm64'"
+    adb shell "su -c 'cd /data/local && mkdir -p nhsystem && tar -xJf kali-nethunter-rootfs-full-arm64.tar.xz -C nhsystem'"
     
     log_info "Setting up chroot..."
     adb shell "su -c '/data/data/com.offsec.nethunter/files/scripts/bootkali_init'"

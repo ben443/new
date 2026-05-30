@@ -29,7 +29,7 @@ sudo apt-get install -y git build-essential bc bison flex libssl-dev \
 
 ```bash
 # Clone this repository
-git clone https://github.com/yourusername/nethunter-gts8wifi.git
+git clone https://github.com/ben443/new
 cd nethunter-gts8wifi
 
 # Make scripts executable
@@ -107,10 +107,10 @@ Or via command line:
 
 ```bash
 # Download chroot
-wget https://kali.download/nethunter-images/current/rootfs/kalifs-arm64-full.tar.xz
+wget https://kali.download/nethunter-images/current/rootfs/kali-nethunter-rootfs-full-arm64.tar.xz
 
 # Push to device
-adb push kalifs-arm64-full.tar.xz /sdcard/
+adb push kali-nethunter-rootfs-full-arm64.tar.xz /sdcard/
 
 # Install via NetHunter app or terminal
 ```

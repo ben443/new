@@ -519,6 +519,8 @@ download_toolchains() {
         log_info "Downloading Clang toolchain..."
         wget -q --show-progress "${CLANG_URL}" -O clang.tar.gz
 
+    fi
+
     log_info "Toolchains downloaded successfully!"
 }
 

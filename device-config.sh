@@ -43,7 +43,7 @@ export KERNEL_MODULE_DIR="kernel"
 # Kernel Source
 export KERNEL_SOURCE_URL="https://github.com/akm-04/Samsung_Kernel_sm8450_common_gts8x"
 export KERNEL_BRANCH="main"
-export KERNEL_ALT_SOURCE="https://github.com/mohammad92/android_kernel_samsung_sm8450"
+export KERNEL_ALT_SOURCE="https://github.com/akm-04/Samsung_Kernel_sm8450_common_gts8x"
 
 # Architecture
 export ARCH="arm64"
