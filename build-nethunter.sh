@@ -477,8 +477,8 @@ download_toolchains() {
         tar -xf aarch64-toolchain.tar.xz
 
         # Validate extraction before move
-        if [ -d "aarch64-linaro-5.5" ]; then
-            mv aarch64-linaro-5.5 aarch64-5.5
+        if [ -d "linaro-aarch64-5.5" ]; then
+            mv linaro-aarch64-5.5 aarch64-5.5
         else
             log_error "Expected directory aarch64-linaro-5.5 not found after extraction!"
             ls -la
