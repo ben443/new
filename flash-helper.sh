@@ -6,41 +6,21 @@
 
 set -e
 
-# Color codes
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-CYAN='\033[0;36m'
-NC='\033[0m'
-
 # Device info
 DEVICE_CODENAME="gts8wifi"
 DEVICE_MODEL="SM-X700"
 
 # Script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Source utility functions
+source "${SCRIPT_DIR}/util.sh"
+
 OUTPUT_DIR="${SCRIPT_DIR}/output"
 
 ################################################################################
 # Helper Functions
 ################################################################################
-
-log_info() {
-    echo -e "${GREEN}[INFO]${NC} $1"
-}
-
-log_warn() {
-    echo -e "${YELLOW}[WARN]${NC} $1"
-}
-
-log_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-log_step() {
-    echo -e "${BLUE}[STEP]${NC} $1"
-}
 
 print_banner() {
     echo -e "${CYAN}"
