@@ -8,15 +8,11 @@
 
 
 
-# Color codes for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
 # Script directory
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Source common utilities
+source "${SCRIPT_DIR}/common-utils.sh"
 
 # Default configuration
 KERNEL_SOURCE_URL="https://github.com/akm-04/Samsung_Kernel_sm8450_common_gts8x"
@@ -54,34 +50,6 @@ CLANG_SHA256="6cd51bc5002e1c3f93c8f388716aaf48ac3efe19279e9b1c8291f69172927cb4"
 # Number of parallel jobs
 JOBS=$(nproc --all)
 
-################################################################################
-# Helper Functions
-################################################################################
-
-print_banner() {
-    echo -e "${BLUE}"
-    echo "╔══════════════════════════════════════════════════════════════════════════════╗"
-    echo "║           NetHunter Kernel Builder for Samsung Galaxy Tab S8                 ║"
-    echo "║                      gts8wifi (SM-X700) - SM8450                             ║"
-    echo "╚══════════════════════════════════════════════════════════════════════════════╝"
-    echo -e "${NC}"
-}
-
-log_info() {
-    echo -e "${GREEN}[INFO]${NC} $1"
-}
-
-log_warn() {
-    echo -e "${YELLOW}[WARN]${NC} $1"
-}
-
-log_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-log_step() {
-    echo -e "${BLUE}[STEP]${NC} $1"
-}
 
 ################################################################################
 # GKI Specific Functions
@@ -2157,7 +2125,7 @@ EOF
 ################################################################################
 
 full_build() {
-    print_banner
+    print_banner "NetHunter Kernel Builder for Samsung Galaxy Tab S8" "gts8wifi (SM-X700) - SM8450" "${BLUE}"
     
     log_info "Starting full NetHunter kernel build for ${DEVICE_MODEL} (${DEVICE_CODENAME})"
     log_info "Android Version: ${ANDROID_VERSION}"
@@ -2173,7 +2141,7 @@ full_build() {
     build_kernel
     package_kernel
     
-    print_banner
+    print_banner "NetHunter Kernel Builder for Samsung Galaxy Tab S8" "gts8wifi (SM-X700) - SM8450" "${BLUE}"
     log_info "Build completed successfully!"
     log_info "Output files are in: ${OUTPUT_DIR}"
     log_info ""
