@@ -31,7 +31,7 @@ log_info() {
 }
 
 log_warn() {
-    echo -e "${YELLOW}[WARN]${NC} $1"
+    echo -e "${YELLOW}[WARN] $1${NC}"
 }
 
 log_error() {
