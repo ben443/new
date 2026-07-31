@@ -87,6 +87,11 @@ check_device() {
 check_root() {
     log_step "Checking root access..."
     
+    if [ "$DEVICE_STATE" != "adb" ]; then
+        log_warn "Device must be in adb mode to check root"
+        return 1
+    fi
+
     if ! adb shell "su -c 'id'" | grep -q "uid=0"; then
         log_error "Root access not available!"
         log_info "Please ensure your device is rooted with Magisk or similar."
