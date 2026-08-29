@@ -506,7 +506,6 @@ download_toolchains() {
             mv linaro-aarch64-5.5 aarch64-5.5
         else
             log_error "Expected directory aarch64-linaro-5.5 not found after extraction!"
-            ls -la
             exit 1
         fi
         rm aarch64-toolchain.tar.xz
@@ -533,7 +532,6 @@ download_toolchains() {
             mv linaro-armhf-5.5 armhf-5.5
         else
             log_error "Expected directory armhf-linaro-5.5 not found after extraction!"
-            ls -la
             exit 1
         fi
         rm arm-toolchain.tar.xz
@@ -560,7 +558,6 @@ download_toolchains() {
             mv android_prebuilts_clang_kernel_linux-x86_clang-r416183b-lineage-20.0 clang-r416183b
         else
             log_error "Expected Clang directory not found after extraction!"
-            ls -la
             exit 1
         fi
         rm clang.tar.gz
