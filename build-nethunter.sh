@@ -91,6 +91,7 @@ check_gki_support() {
     log_step "Checking GKI support..."
     
     cd "${KERNEL_DIR}"
+    MERGE_CONFIG_SH="${KERNEL_DIR}/scripts/kconfig/merge_config.sh"
     
     # Check if GKI defconfig exists
     if [ -f "arch/arm64/configs/${GKI_DEFCONFIG}" ]; then
@@ -134,15 +135,15 @@ configure_gki_kernel() {
 
     if [ -f "${NETHUNTER_DEFCONFIG}" ]; then
         log_info "Merging NetHunter defconfig: ${NETHUNTER_DEFCONFIG}"
-        if [ -f "scripts/kconfig/merge_config.sh" ]; then
-            ./scripts/kconfig/merge_config.sh .config "${NETHUNTER_DEFCONFIG}"
+        if [ -f "${MERGE_CONFIG_SH}" ]; then
+            "${MERGE_CONFIG_SH}" .config "${NETHUNTER_DEFCONFIG}"
         else
             cat "${NETHUNTER_DEFCONFIG}" >> .config
         fi
     elif [ -f "${NETHUNTER_FRAGMENT}" ]; then
         log_info "Merging NetHunter config fragment: ${NETHUNTER_FRAGMENT}"
-        if [ -f "scripts/kconfig/merge_config.sh" ]; then
-            ./scripts/kconfig/merge_config.sh .config "${NETHUNTER_FRAGMENT}"
+        if [ -f "${MERGE_CONFIG_SH}" ]; then
+            "${MERGE_CONFIG_SH}" .config "${NETHUNTER_FRAGMENT}"
         else
             cat "${NETHUNTER_FRAGMENT}" >> .config
         fi
@@ -174,8 +175,8 @@ CONFIG_DEBUG_FS=y
 CONFIG_DEBUG_KERNEL=y
 EOF
 
-    if [ -f "scripts/kconfig/merge_config.sh" ]; then
-        ./scripts/kconfig/merge_config.sh .config "${KERNEL_DIR}/nethunter-gki-extra.config"
+    if [ -f "${MERGE_CONFIG_SH}" ]; then
+        "${MERGE_CONFIG_SH}" .config "${KERNEL_DIR}/nethunter-gki-extra.config"
     else
         cat "${KERNEL_DIR}/nethunter-gki-extra.config" >> .config
     fi
