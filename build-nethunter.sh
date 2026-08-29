@@ -128,14 +128,30 @@ configure_gki_kernel() {
     
     # Apply NetHunter configuration to GKI
     log_info "Applying NetHunter configuration to GKI kernel..."
-    
-    # Merge NetHunter config fragment
-    if [ -f "${SCRIPT_DIR}/nethunter-config.fragment" ]; then
-        cat "${SCRIPT_DIR}/nethunter-config.fragment" >> .config
+
+    NETHUNTER_DEFCONFIG="${SCRIPT_DIR}/.config"
+    NETHUNTER_FRAGMENT="${SCRIPT_DIR}/nethunter-config.fragment"
+
+    if [ -f "${NETHUNTER_DEFCONFIG}" ]; then
+        log_info "Merging NetHunter defconfig: ${NETHUNTER_DEFCONFIG}"
+        if [ -f "scripts/kconfig/merge_config.sh" ]; then
+            ./scripts/kconfig/merge_config.sh -m .config "${NETHUNTER_DEFCONFIG}"
+        else
+            cat "${NETHUNTER_DEFCONFIG}" >> .config
+        fi
+    elif [ -f "${NETHUNTER_FRAGMENT}" ]; then
+        log_info "Merging NetHunter config fragment: ${NETHUNTER_FRAGMENT}"
+        if [ -f "scripts/kconfig/merge_config.sh" ]; then
+            ./scripts/kconfig/merge_config.sh -m .config "${NETHUNTER_FRAGMENT}"
+        else
+            cat "${NETHUNTER_FRAGMENT}" >> .config
+        fi
+    else
+        log_warn "No NetHunter defconfig/fragment found in ${SCRIPT_DIR}"
     fi
     
     # Apply GKI-specific NetHunter options
-    cat >> .config << 'EOF'
+    cat > "${KERNEL_DIR}/nethunter-gki-extra.config" << 'EOF'
 
 # GKI NetHunter Extensions
 CONFIG_MODULES=y
@@ -157,6 +173,14 @@ CONFIG_KALLSYMS_ALL=y
 CONFIG_DEBUG_FS=y
 CONFIG_DEBUG_KERNEL=y
 EOF
+
+    if [ -f "scripts/kconfig/merge_config.sh" ]; then
+        ./scripts/kconfig/merge_config.sh -m .config "${KERNEL_DIR}/nethunter-gki-extra.config"
+    else
+        cat "${KERNEL_DIR}/nethunter-gki-extra.config" >> .config
+    fi
+
+    rm -f "${KERNEL_DIR}/nethunter-gki-extra.config"
     
     make olddefconfig
     
