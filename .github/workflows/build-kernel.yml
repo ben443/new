@@ -1,43 +1,46 @@
-name: Build Galaxy Tab S8 Kernel
+name: Build NetHunter GKI Kernel
 
 on:
   push:
     branches:
       - main
       - master
-  workflow_dispatch: # Allows manual triggering from the GitHub UI
+  pull_request:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
 
 jobs:
-  build-kernel:
+  build-gki-kernel:
     runs-on: ubuntu-22.04
 
     steps:
-      - name: Checkout Kernel Source
+      - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1 # Shallow clone to save time
 
       - name: Setup Build Environment
         run: |
-          echo "Updating packages and installing dependencies..."
           sudo apt-get update -y
-          # Added missing GCC cross-compilers, ncurses, dwarves (pahole), and lz4
-          sudo apt-get install -y build-essential bc curl git python3 python3-pip \
-            zip unzip libssl-dev libelf-dev flex bison libc6-dev-i386 xz-utils \
-            ccache wget rsync cpio lz4 dwarves libncurses-dev \
-            gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi
+          sudo apt-get install -y \
+            git build-essential bc bison flex libssl-dev \
+            libncurses5-dev libncursesw5-dev device-tree-compiler \
+            lz4 xz-utils wget curl python3 python3-pip ccache \
+            libelf-dev libxml2-utils kmod cpio qttools5-dev \
+            libqt5widgets5 fakeroot zip unzip lynx pandoc \
+            axel binutils-aarch64-linux-gnu
 
-      - name: Make Build Script Executable
-        run: chmod +x build.sh
+      - name: Build GKI NetHunter kernel
+        run: |
+          chmod +x build_gki_kernel.sh
+          ./build_gki_kernel.sh
 
-      - name: Run Build Script
-        run: ./build.sh
-
-      - name: Upload Kernel Artifact
+      - name: Upload kernel artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Tab-S8-Kernel-Image
+          name: nethunter-kernel-artifacts
           path: |
-            out/arch/arm64/boot/Image
-            out/arch/arm64/boot/dts/vendor/qcom/*.dtb
+            output/
+            TabS8_Kernel_GKI.zip
+          if-no-files-found: error
           retention-days: 15
