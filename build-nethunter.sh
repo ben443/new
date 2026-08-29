@@ -542,6 +542,28 @@ download_toolchains() {
     if [ ! -d "clang-r416183b" ]; then
         log_info "Downloading Clang toolchain..."
         wget -q --show-progress "${CLANG_URL}" -O clang.tar.gz
+        
+        # Validate checksum
+        log_info "Verifying Clang toolchain checksum..."
+        if ! echo "${CLANG_SHA256}  clang.tar.gz" | sha256sum -c - >/dev/null; then
+            log_error "Checksum validation failed for Clang toolchain!"
+            rm -f clang.tar.gz
+            exit 1
+        fi
+        log_info "Checksum verified successfully."
+
+        tar -xzf clang.tar.gz
+
+        # Validate extraction before move
+        if [ -d "android_prebuilts_clang_kernel_linux-x86_clang-r416183b-lineage-20.0" ]; then
+            mv android_prebuilts_clang_kernel_linux-x86_clang-r416183b-lineage-20.0 clang-r416183b
+        else
+            log_error "Expected Clang directory not found after extraction!"
+            ls -la
+            exit 1
+        fi
+        rm clang.tar.gz
+    fi
 
     log_info "Toolchains downloaded successfully!"
 }
