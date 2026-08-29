@@ -122,6 +122,19 @@ configure_gki_kernel() {
     log_step "Configuring GKI kernel..."
     
     cd "${KERNEL_DIR}"
+    MERGE_CONFIG_SH="${KERNEL_DIR}/scripts/kconfig/merge_config.sh"
+    merge_into_config() {
+        local config_fragment="$1"
+        if [ -f "${MERGE_CONFIG_SH}" ]; then
+            "${MERGE_CONFIG_SH}" -m .config "${config_fragment}" || {
+                log_error "Failed to merge config fragment: ${config_fragment}"
+                exit 1
+            }
+            [ -f .config.new ] && mv .config.new .config
+        else
+            cat "${config_fragment}" >> .config
+        fi
+    }
     
     # For GKI, we use the GKI defconfig as base
     log_info "Using GKI defconfig: ${GKI_DEFCONFIG}"
@@ -135,26 +148,17 @@ configure_gki_kernel() {
 
     if [ -f "${NETHUNTER_DEFCONFIG}" ]; then
         log_info "Merging NetHunter defconfig: ${NETHUNTER_DEFCONFIG}"
-        if [ -f "${MERGE_CONFIG_SH}" ]; then
-            "${MERGE_CONFIG_SH}" -m .config "${NETHUNTER_DEFCONFIG}"
-            [ -f .config.new ] && mv .config.new .config
-        else
-            cat "${NETHUNTER_DEFCONFIG}" >> .config
-        fi
+        merge_into_config "${NETHUNTER_DEFCONFIG}"
     elif [ -f "${NETHUNTER_FRAGMENT}" ]; then
         log_info "Merging NetHunter config fragment: ${NETHUNTER_FRAGMENT}"
-        if [ -f "${MERGE_CONFIG_SH}" ]; then
-            "${MERGE_CONFIG_SH}" -m .config "${NETHUNTER_FRAGMENT}"
-            [ -f .config.new ] && mv .config.new .config
-        else
-            cat "${NETHUNTER_FRAGMENT}" >> .config
-        fi
+        merge_into_config "${NETHUNTER_FRAGMENT}"
     else
         log_warn "No NetHunter defconfig/fragment found in ${SCRIPT_DIR}"
     fi
     
     # Apply GKI-specific NetHunter options
-    cat > "${KERNEL_DIR}/nethunter-gki-extra.config" << 'EOF'
+    NETHUNTER_EXTRA_CONFIG="$(mktemp)"
+    cat > "${NETHUNTER_EXTRA_CONFIG}" << 'EOF'
 
 # GKI NetHunter Extensions
 CONFIG_MODULE_SIG=y
@@ -169,14 +173,9 @@ CONFIG_MODULE_SIG_KEY=""
 CONFIG_DEBUG_KERNEL=y
 EOF
 
-    if [ -f "${MERGE_CONFIG_SH}" ]; then
-        "${MERGE_CONFIG_SH}" -m .config "${KERNEL_DIR}/nethunter-gki-extra.config"
-        [ -f .config.new ] && mv .config.new .config
-    else
-        cat "${KERNEL_DIR}/nethunter-gki-extra.config" >> .config
-    fi
+    merge_into_config "${NETHUNTER_EXTRA_CONFIG}"
 
-    rm -f "${KERNEL_DIR}/nethunter-gki-extra.config"
+    rm -f "${NETHUNTER_EXTRA_CONFIG}"
     
     make olddefconfig
     
