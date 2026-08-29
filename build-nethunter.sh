@@ -130,7 +130,8 @@ configure_gki_kernel() {
     # Apply NetHunter configuration to GKI
     log_info "Applying NetHunter configuration to GKI kernel..."
 
-    NETHUNTER_DEFCONFIG="${SCRIPT_DIR}/.config"
+    NETHUNTER_DEFCONFIG="${SCRIPT_DIR}/nethunter_defconfig"
+    LEGACY_NETHUNTER_DEFCONFIG="${SCRIPT_DIR}/.config"
     NETHUNTER_FRAGMENT="${SCRIPT_DIR}/nethunter-config.fragment"
 
     if [ -f "${NETHUNTER_DEFCONFIG}" ]; then
@@ -139,6 +140,13 @@ configure_gki_kernel() {
             "${MERGE_CONFIG_SH}" -m .config "${NETHUNTER_DEFCONFIG}"
         else
             cat "${NETHUNTER_DEFCONFIG}" >> .config
+        fi
+    elif [ -f "${LEGACY_NETHUNTER_DEFCONFIG}" ]; then
+        log_info "Merging legacy NetHunter defconfig: ${LEGACY_NETHUNTER_DEFCONFIG}"
+        if [ -f "${MERGE_CONFIG_SH}" ]; then
+            "${MERGE_CONFIG_SH}" -m .config "${LEGACY_NETHUNTER_DEFCONFIG}"
+        else
+            cat "${LEGACY_NETHUNTER_DEFCONFIG}" >> .config
         fi
     elif [ -f "${NETHUNTER_FRAGMENT}" ]; then
         log_info "Merging NetHunter config fragment: ${NETHUNTER_FRAGMENT}"

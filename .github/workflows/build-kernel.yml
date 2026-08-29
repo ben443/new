@@ -41,6 +41,5 @@ jobs:
           name: nethunter-kernel-artifacts
           path: |
             output/
-            TabS8_Kernel_GKI.zip
           if-no-files-found: error
           retention-days: 15
