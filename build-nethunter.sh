@@ -137,6 +137,7 @@ configure_gki_kernel() {
         log_info "Merging NetHunter defconfig: ${NETHUNTER_DEFCONFIG}"
         if [ -f "${MERGE_CONFIG_SH}" ]; then
             "${MERGE_CONFIG_SH}" -m .config "${NETHUNTER_DEFCONFIG}"
+            [ -f .config.new ] && mv .config.new .config
         else
             cat "${NETHUNTER_DEFCONFIG}" >> .config
         fi
@@ -144,6 +145,7 @@ configure_gki_kernel() {
         log_info "Merging NetHunter config fragment: ${NETHUNTER_FRAGMENT}"
         if [ -f "${MERGE_CONFIG_SH}" ]; then
             "${MERGE_CONFIG_SH}" -m .config "${NETHUNTER_FRAGMENT}"
+            [ -f .config.new ] && mv .config.new .config
         else
             cat "${NETHUNTER_FRAGMENT}" >> .config
         fi
@@ -169,6 +171,7 @@ EOF
 
     if [ -f "${MERGE_CONFIG_SH}" ]; then
         "${MERGE_CONFIG_SH}" -m .config "${KERNEL_DIR}/nethunter-gki-extra.config"
+        [ -f .config.new ] && mv .config.new .config
     else
         cat "${KERNEL_DIR}/nethunter-gki-extra.config" >> .config
     fi
