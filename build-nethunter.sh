@@ -136,14 +136,14 @@ configure_gki_kernel() {
     if [ -f "${NETHUNTER_DEFCONFIG}" ]; then
         log_info "Merging NetHunter defconfig: ${NETHUNTER_DEFCONFIG}"
         if [ -f "${MERGE_CONFIG_SH}" ]; then
-            "${MERGE_CONFIG_SH}" .config "${NETHUNTER_DEFCONFIG}"
+            "${MERGE_CONFIG_SH}" -m .config "${NETHUNTER_DEFCONFIG}"
         else
             cat "${NETHUNTER_DEFCONFIG}" >> .config
         fi
     elif [ -f "${NETHUNTER_FRAGMENT}" ]; then
         log_info "Merging NetHunter config fragment: ${NETHUNTER_FRAGMENT}"
         if [ -f "${MERGE_CONFIG_SH}" ]; then
-            "${MERGE_CONFIG_SH}" .config "${NETHUNTER_FRAGMENT}"
+            "${MERGE_CONFIG_SH}" -m .config "${NETHUNTER_FRAGMENT}"
         else
             cat "${NETHUNTER_FRAGMENT}" >> .config
         fi
@@ -176,7 +176,7 @@ CONFIG_DEBUG_KERNEL=y
 EOF
 
     if [ -f "${MERGE_CONFIG_SH}" ]; then
-        "${MERGE_CONFIG_SH}" .config "${KERNEL_DIR}/nethunter-gki-extra.config"
+        "${MERGE_CONFIG_SH}" -m .config "${KERNEL_DIR}/nethunter-gki-extra.config"
     else
         cat "${KERNEL_DIR}/nethunter-gki-extra.config" >> .config
     fi
@@ -204,7 +204,7 @@ configure_vendor_modules() {
         log_info "Using vendor defconfig: ${VENDOR_DEFCONFIG}"
         
         # Merge vendor defconfig with GKI config
-        ./scripts/kconfig/merge_config.sh "${OUTPUT_DIR}/.config.gki" "arch/arm64/configs/${VENDOR_DEFCONFIG}"
+        ./scripts/kconfig/merge_config.sh -m "${OUTPUT_DIR}/.config.gki" "arch/arm64/configs/${VENDOR_DEFCONFIG}"
     fi
     
     # Apply vendor-specific NetHunter drivers as modules
@@ -1994,7 +1994,7 @@ EOF
     
     # Use merge_config.sh if available
     if [ -f "scripts/kconfig/merge_config.sh" ]; then
-        ./scripts/kconfig/merge_config.sh .config nethunter.config
+        ./scripts/kconfig/merge_config.sh -m .config nethunter.config
     else
         # Manual merge
         cat nethunter.config >> .config
